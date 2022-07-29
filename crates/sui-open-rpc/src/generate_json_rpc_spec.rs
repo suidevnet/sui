@@ -16,8 +16,8 @@ use sui_json_rpc::gateway_api::{GatewayWalletSyncApiImpl, RpcGatewayImpl, Transa
 use sui_json_rpc::read_api::{FullNodeApi, ReadApi};
 use sui_json_rpc::sui_rpc_doc;
 use sui_json_rpc::SuiRpcModule;
-use test_utils::network::{start_rpc_test_network};
 use sui_test_data::create_test_data;
+use test_utils::network::start_rpc_test_network;
 
 mod examples;
 
@@ -69,7 +69,9 @@ async fn main() {
         Action::Print => {
             let content = serde_json::to_string_pretty(&open_rpc).unwrap();
             println!("{content}");
-            let network = start_rpc_test_network(Some(GenesisConfig::custom_genesis(1, 4, 30))).await.unwrap();
+            let network = start_rpc_test_network(Some(GenesisConfig::custom_genesis(1, 4, 30)))
+                .await
+                .unwrap();
             let (objects, txs, addresses) = create_test_data(network).await.unwrap();
             println!("{}", serde_json::to_string_pretty(&objects).unwrap());
             println!("{}", serde_json::to_string_pretty(&txs).unwrap());
@@ -79,7 +81,9 @@ async fn main() {
             let content = serde_json::to_string_pretty(&open_rpc).unwrap();
             let mut f = File::create(FILE_PATH).unwrap();
             writeln!(f, "{content}").unwrap();
-            let network = start_rpc_test_network(Some(GenesisConfig::custom_genesis(1, 4, 30))).await.unwrap();
+            let network = start_rpc_test_network(Some(GenesisConfig::custom_genesis(1, 4, 30)))
+                .await
+                .unwrap();
             let (objects, txs, addresses) = create_test_data(network).await.unwrap();
             let content = serde_json::to_string_pretty(&objects).unwrap();
             let mut f = File::create(OBJECT_SAMPLE_FILE_PATH).unwrap();
