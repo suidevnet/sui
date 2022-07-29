@@ -128,7 +128,7 @@ impl Cluster for LocalNewCluster {
     async fn start(_options: &ClusterTestOpt) -> Result<Self, anyhow::Error> {
         let genesis_config = GenesisConfig::for_local_testing();
 
-        let test_network = start_rpc_test_network_with_fullnode(Some(genesis_config), 1)
+        let test_network = start_rpc_test_network_with_fullnode(Some(genesis_config), 1, None)
             .await
             .unwrap_or_else(|e| panic!("Failed to start a local network, e: {e}"));
         let fullnode: &Node = test_network
