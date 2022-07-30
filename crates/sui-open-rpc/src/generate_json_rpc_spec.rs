@@ -72,7 +72,7 @@ async fn main() {
             let network = start_rpc_test_network(Some(GenesisConfig::custom_genesis(1, 4, 30)))
                 .await
                 .unwrap();
-            let (objects, txs, addresses) = create_test_data(network).await.unwrap();
+            let (objects, txs, addresses) = create_test_data(&network).await.unwrap();
             println!("{}", serde_json::to_string_pretty(&objects).unwrap());
             println!("{}", serde_json::to_string_pretty(&txs).unwrap());
             println!("{}", serde_json::to_string_pretty(&addresses).unwrap());
@@ -84,7 +84,7 @@ async fn main() {
             let network = start_rpc_test_network(Some(GenesisConfig::custom_genesis(1, 4, 30)))
                 .await
                 .unwrap();
-            let (objects, txs, addresses) = create_test_data(network).await.unwrap();
+            let (objects, txs, addresses) = create_test_data(&network).await.unwrap();
             let content = serde_json::to_string_pretty(&objects).unwrap();
             let mut f = File::create(OBJECT_SAMPLE_FILE_PATH).unwrap();
             writeln!(f, "{content}").unwrap();
