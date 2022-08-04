@@ -36,3 +36,24 @@ pub fn ecrecover(
         Err(_) => Ok(NativeResult::err(cost, 0)),
     }
 }
+
+pub fn keccak256(
+    context: &mut NativeContext,
+    ty_args: Vec<Type>,
+    mut args: VecDeque<Value>,
+) -> PartialVMResult<NativeResult> {
+    debug_assert!(ty_args.is_empty());
+    debug_assert!(args.len() == 1);
+
+    // TODO: implement native gas cost estimation https://github.com/MystenLabs/sui/issues/3593
+    let cost = native_gas(context.cost_table(), NativeCostIndex::EMIT_EVENT, 0);
+    let msg = pop_arg!(args, Vec<u8>);
+    Ok(NativeResult::ok(
+        cost,
+        smallvec![Value::vector_u8(
+            <sha3::Keccak256 as sha3::digest::Digest>::digest(msg)
+                .as_slice()
+                .to_vec()
+        )],
+    ))
+}
