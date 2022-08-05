@@ -9,7 +9,7 @@ use sui_core::{
 };
 use sui_types::{
     base_types::{ObjectID, ObjectRef},
-    crypto::EmptySignInfo,
+    crypto::{AccountKeyPair, EmptySignInfo},
     messages::{TransactionEffects, TransactionEnvelope},
     object::{Object, ObjectRead, Owner},
 };
@@ -18,7 +18,6 @@ use futures::FutureExt;
 use sui_quorum_driver::QuorumDriverHandler;
 use sui_types::{
     base_types::SuiAddress,
-    crypto::AccountKeyPair,
     messages::{
         ExecuteTransactionRequest, ExecuteTransactionRequestType, ExecuteTransactionResponse,
         Transaction,

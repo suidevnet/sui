@@ -10,7 +10,9 @@ use tracing::info;
 
 use sui_sdk::crypto::SuiKeystore;
 use sui_types::base_types::{decode_bytes_hex, encode_bytes_hex};
-use sui_types::crypto::{AccountKeyPair, AuthorityKeyPair, KeypairTraits};
+use sui_types::crypto::{
+    AccountKeyPair, AuthorityKeyPair, EncodeDecodeBase64, KeyPair, KeypairTraits,
+};
 use sui_types::sui_serde::{Base64, Encoding};
 use sui_types::{base_types::SuiAddress, crypto::get_key_pair};
 
@@ -25,7 +27,7 @@ pub enum KeyToolCommand {
     },
     /// Extract components
     Unpack {
-        keypair: AccountKeyPair,
+        keypair: KeyPair,
     },
     /// List all keys in the keystore
     List,
@@ -45,11 +47,12 @@ impl KeyToolCommand {
     pub fn execute(self, keystore: &mut SuiKeystore) -> Result<(), anyhow::Error> {
         match self {
             KeyToolCommand::Generate => {
+                // TODO: add flag to this command to enable generate Secp256k1 keypair
                 let (_address, keypair): (_, AccountKeyPair) = get_key_pair();
 
                 let hex = encode_bytes_hex(keypair.public());
                 let file_name = format!("{hex}.key");
-                write_keypair_to_file(&keypair, &file_name)?;
+                write_keypair_to_file(&KeyPair::Ed25519KeyPair(keypair), &file_name)?;
                 println!("Ed25519 key generated and saved to '{file_name}'");
             }
 
@@ -59,7 +62,7 @@ impl KeyToolCommand {
             }
 
             KeyToolCommand::Unpack { keypair } => {
-                store_and_print_keypair(keypair.public().into(), keypair)
+                store_and_print_keypair(keypair.public().inner_into(), keypair)
             }
             KeyToolCommand::List => {
                 println!(
@@ -70,7 +73,7 @@ impl KeyToolCommand {
                 for pub_key in keystore.keys() {
                     println!(
                         " {0: ^42} | {1: ^45} ",
-                        Into::<SuiAddress>::into(&pub_key),
+                        pub_key.inner_into(),
                         Base64::encode(&pub_key),
                     );
                 }
@@ -106,7 +109,7 @@ impl KeyToolCommand {
     }
 }
 
-fn store_and_print_keypair<K: KeypairTraits>(address: SuiAddress, keypair: K) {
+fn store_and_print_keypair(address: SuiAddress, keypair: KeyPair) {
     let path_str = format!("{}.key", address).to_lowercase();
     let path = Path::new(&path_str);
     let address = format!("{}", address);
@@ -117,8 +120,8 @@ fn store_and_print_keypair<K: KeypairTraits>(address: SuiAddress, keypair: K) {
     println!("Address and keypair written to {}", path.to_str().unwrap());
 }
 
-pub fn write_keypair_to_file<K: KeypairTraits, P: AsRef<std::path::Path>>(
-    keypair: &K,
+pub fn write_keypair_to_file<P: AsRef<std::path::Path>>(
+    keypair: &KeyPair,
     path: P,
 ) -> anyhow::Result<()> {
     let contents = keypair.encode_base64();
@@ -126,9 +129,16 @@ pub fn write_keypair_to_file<K: KeypairTraits, P: AsRef<std::path::Path>>(
     Ok(())
 }
 
-pub fn read_keypair_from_file<K: KeypairTraits, P: AsRef<std::path::Path>>(
+// TODO: Currently read as AuthorityKeyPair (Ed25519 only), make it to read generic KeyPair
+pub fn read_keypair_from_file<P: AsRef<std::path::Path>>(
     path: P,
-) -> anyhow::Result<K> {
+) -> anyhow::Result<AuthorityKeyPair> {
     let contents = std::fs::read_to_string(path)?;
-    K::decode_base64(contents.as_str().trim()).map_err(|e| anyhow!(e))
+    match KeyPair::decode_base64(contents.as_str().trim()) {
+        Ok(kp) => match kp {
+            KeyPair::Ed25519KeyPair(k) => Ok(k),
+            KeyPair::Secp256k1KeyPair(_) => Err(anyhow!("")),
+        },
+        Err(e) => Err(anyhow!(e)),
+    }
 }

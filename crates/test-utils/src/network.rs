@@ -26,6 +26,7 @@ use sui_sdk::crypto::KeystoreType;
 use sui_sdk::{ClientType, SuiClient};
 use sui_swarm::memory::{Swarm, SwarmBuilder};
 use sui_types::base_types::SuiAddress;
+use sui_types::crypto::KeyPair::Ed25519KeyPair;
 use sui_types::crypto::KeypairTraits;
 const NUM_VALIDAOTR: usize = 4;
 
@@ -60,7 +61,7 @@ pub async fn start_test_network_with_fullnodes(
     swarm.config().save(&network_path)?;
     let mut keystore = KeystoreType::File(keystore_path.clone()).init()?;
     for key in &swarm.config().account_keys {
-        keystore.add_key(key.copy())?;
+        keystore.add_key(Ed25519KeyPair(key.copy()))?;
     }
 
     let validators = swarm.config().validator_set().to_owned();

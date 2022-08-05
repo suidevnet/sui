@@ -10,7 +10,7 @@ use sui_core::{
 };
 use sui_types::{
     base_types::{ObjectID, ObjectRef, SuiAddress},
-    crypto::{get_key_pair, AccountKeyPair, EmptySignInfo},
+    crypto::{get_key_pair, AccountKeyPair, EmptySignInfo, KeyPair, KeypairTraits},
     messages::TransactionEnvelope,
     object::Owner,
 };
@@ -102,7 +102,7 @@ impl Workload<dyn Payload> for SharedCounterWorkload {
         let primary_gas = get_latest(self.test_gas, aggregator).await.unwrap();
         let primary_gas_ref = primary_gas.compute_object_reference();
         let mut publish_module_gas_ref = None;
-        let (address, keypair) = get_key_pair();
+        let (address, keypair): (_, AccountKeyPair) = get_key_pair();
         if let Some((_updated, minted)) = transfer_sui_for_testing(
             (primary_gas_ref, Owner::AddressOwner(self.test_gas_owner)),
             &self.test_gas_keypair,
@@ -138,7 +138,7 @@ impl Workload<dyn Payload> for SharedCounterWorkload {
         // Make as many gas objects as the number of counters
         let mut counters_gas = vec![];
         for _ in 0..count {
-            let (address, keypair) = get_key_pair();
+            let (address, keypair): (_, AccountKeyPair) = get_key_pair();
             if let Some((updated, minted)) = transfer_sui_for_testing(
                 (primary_gas_ref, Owner::AddressOwner(self.test_gas_owner)),
                 &self.test_gas_keypair,
@@ -161,7 +161,7 @@ impl Workload<dyn Payload> for SharedCounterWorkload {
                     gas,
                     self.basics_package_ref.unwrap(),
                     sender,
-                    &keypair,
+                    &KeyPair::Ed25519KeyPair(keypair.copy()),
                 );
                 if let Some(effects) = submit_transaction(transaction, aggregator).await {
                     Box::new(SharedCounterTestPayload {

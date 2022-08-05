@@ -14,7 +14,7 @@ use sui_json_rpc_types::SuiObjectInfo;
 use sui_sdk::crypto::SuiKeystore;
 use sui_types::base_types::ObjectID;
 use sui_types::base_types::ObjectRef;
-use sui_types::crypto::{get_key_pair, AccountKeyPair, AuthorityKeyPair, KeypairTraits};
+use sui_types::crypto::{get_key_pair, AccountKeyPair, AuthorityKeyPair, KeyPair, KeypairTraits};
 use sui_types::gas_coin::GasCoin;
 use sui_types::messages::CallArg;
 use sui_types::messages::{
@@ -119,8 +119,8 @@ pub fn make_transactions_with_pre_genesis_objects(
     // consecutive objects must have the same owner for the transaction to be valid.
     let mut addresses_two_by_two = Vec::new();
     let mut signers = Vec::new(); // Keys are not copiable, move them here.
-    for keypair in keys.keys() {
-        let address = (&keypair).into();
+    for pk in keys.keys() {
+        let address = pk.inner_into();
         addresses_two_by_two.push(address);
         addresses_two_by_two.push(address);
         signers.push(keys.signer(address));
@@ -270,7 +270,7 @@ pub fn make_counter_create_transaction(
     gas_object: ObjectRef,
     package_ref: ObjectRef,
     sender: SuiAddress,
-    keypair: &AccountKeyPair,
+    keypair: &KeyPair,
 ) -> Transaction {
     let data = TransactionData::new_move_call(
         sender,

@@ -234,7 +234,7 @@ mod test {
     use crate::keytool::write_keypair_to_file;
     use anyhow::Result;
     use sui_config::{utils, ValidatorInfo};
-    use sui_types::crypto::{get_key_pair_from_rng, AuthorityKeyPair};
+    use sui_types::crypto::{get_key_pair_from_rng, AuthorityKeyPair, KeyPair};
 
     #[test]
     fn ceremony() -> Result<()> {
@@ -256,7 +256,8 @@ mod test {
                     narwhal_consensus_address: utils::new_network_address(),
                 };
                 let key_file = dir.path().join(format!("{}.key", info.name));
-                write_keypair_to_file(&keypair, &key_file).unwrap();
+                write_keypair_to_file(&KeyPair::Ed25519KeyPair(keypair), &key_file).unwrap();
+
                 (key_file, info)
             })
             .collect::<Vec<_>>();

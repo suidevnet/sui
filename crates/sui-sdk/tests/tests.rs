@@ -37,7 +37,7 @@ fn sui_wallet_address_mnemonic_test() -> Result<(), anyhow::Error> {
     keystore.import_from_mnemonic(phrase).unwrap();
 
     // SuiAddress without the key flag.
-    let pubkey = keystore.keys()[0].clone();
+    let pubkey = &keystore.keys()[0];
     let mut hasher = Sha3_256::default();
     hasher.update(pubkey);
     let g_arr = hasher.finalize();

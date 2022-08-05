@@ -6,8 +6,9 @@ use clap::*;
 use sui_config::genesis_config::GenesisConfig;
 use sui_swarm::memory::Node;
 use sui_swarm::memory::Swarm;
+use sui_types::crypto::get_key_pair;
+use sui_types::crypto::AccountKeyPair;
 use sui_types::crypto::KeypairTraits;
-use sui_types::crypto::{get_key_pair, AccountKeyPair};
 use test_utils::network::{start_rpc_test_network_with_fullnode, TestNetwork};
 
 const DEVNET_FAUCET_ADDR: &str = "https://faucet.devnet.sui.io:443";
