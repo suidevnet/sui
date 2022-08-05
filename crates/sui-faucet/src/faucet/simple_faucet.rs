@@ -121,6 +121,7 @@ impl SimpleFaucet {
         let context = &self.wallet;
         let data = context
             .gateway
+            .transaction_builder()
             .split_coin(
                 signer,
                 coin_id,
@@ -155,6 +156,7 @@ impl SimpleFaucet {
 
         let data = context
             .gateway
+            .transaction_builder()
             .transfer_object(signer, coin_id, Some(gas_object_id), budget, recipient)
             .await?;
         let signature = context.keystore.sign(&signer, &data.to_bytes())?;
