@@ -16,7 +16,7 @@ use sui_json_rpc::gateway_api::{GatewayWalletSyncApiImpl, RpcGatewayImpl, Transa
 use sui_json_rpc::read_api::{FullNodeApi, ReadApi};
 use sui_json_rpc::sui_rpc_doc;
 use sui_json_rpc::SuiRpcModule;
-use sui_test_data::create_test_data;
+use test_utils::preset::create_test_data;
 use test_utils::network::start_rpc_test_network;
 
 mod examples;
